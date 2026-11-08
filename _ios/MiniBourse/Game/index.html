@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Mini Bourse</title>
+<style>
+:root{--bg1:#0f3d3a;--bg2:#146b5a;--card:#fff;--ink:#16322f;--up:#14a85a;--down:#e0483e;--gold:#ffd23f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
+body{font-family:-apple-system,system-ui,"Helvetica Neue",sans-serif;color:#fff;background:linear-gradient(170deg,var(--bg1),var(--bg2));
+display:flex;flex-direction:column;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom)}
+header{padding:10px 2px 6px}
+.top{display:flex;justify-content:space-between;align-items:baseline}
+h1{margin:0;font-size:20px;letter-spacing:-.02em}
+.week{font-size:14px;opacity:.9;font-weight:600}
+.bar{height:6px;background:rgba(255,255,255,.2);border-radius:6px;margin:6px 0 8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .4s}
+.sum{display:flex;gap:8px}
+.sum div{flex:1;background:rgba(255,255,255,.12);border-radius:14px;padding:7px 10px;font-size:12px}
+.sum b{display:block;font-size:18px;font-variant-numeric:tabular-nums}
+.news{margin:8px 0 6px;background:var(--gold);color:#3a2a00;border-radius:16px;padding:10px 12px;font-size:14px;line-height:1.3;font-weight:600}
+.news small{display:block;font-weight:700;opacity:.7;margin-bottom:2px;letter-spacing:.04em;text-transform:uppercase;font-size:11px}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 0 8px}
+.co{background:var(--card);color:var(--ink);border-radius:16px;padding:9px 10px;margin-bottom:8px;display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;align-items:center}
+.em{font-size:30px;text-align:center}
+.nm{font-weight:700;font-size:15px}
+.sub{font-size:12px;opacity:.65}
+.pr{display:flex;align-items:center;flex-wrap:wrap;gap:2px 6px;margin-top:2px;font-variant-numeric:tabular-nums}
+.pr b{font-size:17px}
+.ch{white-space:nowrap;font-size:12px;font-weight:700;border-radius:8px;padding:1px 6px}
+.ch.u{background:#d8f5e4;color:#0b7a3f}.ch.d{background:#fde0de;color:#b02a22}.ch.z{background:#eee;color:#666}
+svg.sp{display:block;margin-top:2px}
+.ctl{display:flex;align-items:center;gap:4px}
+.ctl button{width:44px;height:44px;border-radius:50%;border:0;font:800 24px/1 -apple-system,system-ui,sans-serif;color:#fff;background:var(--up)}
+.ctl button.m{background:var(--down)}
+.ctl button:disabled{background:#cfd8d6;color:#fff}
+.ctl span{min-width:22px;text-align:center;font-weight:800;font-size:18px}
+footer{padding:6px 0 12px}
+#go{width:100%;min-height:54px;border:0;border-radius:18px;font:800 18px -apple-system,system-ui,sans-serif;background:#fff;color:#0f3d3a}
+.ov{position:fixed;inset:0;background:rgba(5,30,28,.86);display:none;align-items:center;justify-content:center;padding:22px;z-index:5}
+.ov.show{display:flex}
+.box{background:#fff;color:var(--ink);border-radius:24px;padding:22px 20px;text-align:center;max-width:360px;width:100%;max-height:92%;overflow:auto}
+.box h2{margin:0 0 8px;font-size:26px}
+.box p{margin:8px 0;font-size:16px;line-height:1.35}
+.box .big{font-size:42px;margin:4px 0}
+.box ul{text-align:left;padding-left:20px;margin:8px 0;font-size:15px;line-height:1.4}
+.box button{margin-top:12px;width:100%;min-height:50px;border:0;border-radius:16px;background:#0f3d3a;color:#fff;font:800 17px -apple-system,system-ui,sans-serif}
+.lesson{background:#eef9f3;border-radius:14px;padding:10px 12px;text-align:left;font-size:15px;line-height:1.35;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top"><h1>🏦 Mini Bourse</h1><span class="week" id="wk"></span></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="sum">
+    <div>💰 Pièces<b id="cash"></b></div>
+    <div>📈 Tout ce que tu as<b id="tot"></b></div>
+  </div>
+</header>
+<div class="news" id="news"></div>
+<main id="list"></main>
+<footer><button id="go">Semaine suivante ▶</button></footer>
+
+<div class="ov" id="intro"><div class="box">
+  <div class="big">🏦</div><h2>Bienvenue !</h2>
+  <p>Tu as <b>100 pièces</b> (pour de faux, pour jouer). Une <b>action</b>, c'est un petit morceau d'une entreprise.</p>
+  <ul>
+    <li>Lis la <b>nouvelle</b> en jaune.</li>
+    <li>Achète avec <b>+</b>, vends avec <b>−</b>.</li>
+    <li>Appuie sur <b>Semaine suivante</b> et regarde les prix bouger.</li>
+  </ul>
+  <p>Après 12 semaines, vois combien tu as gagné !</p><p style="font-size:12px;opacity:.65">Jeu pour apprendre : entreprises imaginaires, pièces fictives, aucun vrai argent.</p>
+  <button id="start">C'est parti !</button>
+</div></div>
+
+<div class="ov" id="end"><div class="box">
+  <div class="big" id="stars"></div><h2 id="etitle"></h2>
+  <p id="eres"></p>
+  <div class="lesson" id="lesson"></div>
+  <p id="ebest" style="font-size:14px;opacity:.75"></p>
+  <button id="again">Rejouer</button>
+</div></div>
+
+<script>
+(function(){
+"use strict";
+var W=12, START=1000;                       // tout est en dixièmes de pièce (entiers)
+var CO=[
+ {id:"glace",em:"🍦",nm:"Glaces Polaire",tx:"Vend des glaces",vol:.05},
+ {id:"espace",em:"🚀",nm:"Fusée Max",tx:"Voyages dans l'espace",vol:.09},
+ {id:"jeu",em:"🎮",nm:"Jeux Pixel",tx:"Jeux vidéo",vol:.07},
+ {id:"nature",em:"🥕",nm:"Potager Bio",tx:"Fruits et légumes",vol:.03},
+ {id:"jouet",em:"🧸",nm:"Jouets Rigolo",tx:"Jouets et peluches",vol:.06},
+ {id:"energie",em:"⚡",nm:"Énergie Soleil",tx:"Électricité verte",vol:.05}
+];
+var EV=[
+ {t:"Grosse canicule prévue : tout le monde veut des glaces ! ☀️",e:{glace:.18,energie:.05}},
+ {t:"Une fusée décolle en direct à la télé, quel succès ! 🚀",e:{espace:.22}},
+ {t:"Un nouveau jeu vidéo devient le plus téléchargé ! 🎮",e:{jeu:.2}},
+ {t:"Il pleut beaucoup : les récoltes sont superbes. 🌧️",e:{nature:.12,glace:-.1}},
+ {t:"Noël approche : les enfants veulent des jouets ! 🎄",e:{jouet:.2}},
+ {t:"Grosse panne de courant : on a besoin d'énergie verte ! ⚡",e:{energie:.18}},
+ {t:"Un accident de fusée fait peur à tout le monde. 💥",e:{espace:-.25}},
+ {t:"Un bug oblige à retirer un jeu du magasin. 🐛",e:{jeu:-.2}},
+ {t:"Il gèle dans les champs : moins de légumes. 🥶",e:{nature:-.15}},
+ {t:"Un jouet est rappelé : il n'est pas sûr. 🧸",e:{jouet:-.2}},
+ {t:"Un été froid : personne ne veut de glaces. ❄️",e:{glace:-.2}},
+ {t:"Beaucoup de nuages : moins d'électricité solaire. ☁️",e:{energie:-.15}},
+ {t:"Semaine calme : rien de spécial. ☕",e:{}},
+ {t:"C'est la rentrée : les familles dépensent moins. 🎒",e:{jouet:-.08,jeu:-.08}},
+ {t:"Tout le monde veut manger plus sain ! 🥕",e:{nature:.18}},
+ {t:"Un inventeur annonce une batterie géante ! 🔋",e:{energie:.2,espace:.05}}
+];
+var S;                                       // état de la partie
+function rnd(){return Math.random()}
+function fmt(t){return (t/10).toFixed(1).replace(".",",")}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function pickEvent(){var i;do{i=Math.floor(rnd()*EV.length)}while(S&&i===S.lastEv&&EV.length>1);return i}
+function newGame(){
+  S={week:1,cash:START,own:{},price:{},hist:{},last:{},lastEv:-1,ev:0,trades:0,peak:{}};
+  CO.forEach(function(c){S.price[c.id]=100;S.hist[c.id]=[100];S.own[c.id]=0;S.last[c.id]=0;S.peak[c.id]=0});
+  S.ev=pickEvent();S.lastEv=S.ev;
+}
+function worth(){var t=S.cash;CO.forEach(function(c){t+=S.own[c.id]*S.price[c.id]});return t}
+function advance(){
+  var ev=EV[S.ev],follows=rnd()<0.8;
+  CO.forEach(function(c){
+    var eff=(ev.e[c.id]||0)*(follows?1:.2);
+    var noise=(rnd()-.5)*2*c.vol;
+    var p=Math.round(S.price[c.id]*(1+eff+noise));
+    p=Math.max(10,p);
+    S.last[c.id]=p-S.price[c.id];
+    S.price[c.id]=p;S.hist[c.id].push(p);
+  });
+  S.week++;
+  if(S.week<=W){S.ev=pickEvent();S.lastEv=S.ev}
+}
+function buy(id){var p=S.price[id];if(S.cash>=p){S.cash-=p;S.own[id]++;S.trades++;return true}return false}
+function sell(id){if(S.own[id]>0){S.cash+=S.price[id];S.own[id]--;S.trades++;return true}return false}
+function spark(h){
+  var w=56,hh=20,mn=Math.min.apply(0,h),mx=Math.max.apply(0,h),r=(mx-mn)||1;
+  var pts=h.map(function(v,i){return (i*(w/Math.max(1,W))).toFixed(1)+","+(hh-2-((v-mn)/r)*(hh-4)).toFixed(1)}).join(" ");
+  var up=h[h.length-1]>=h[0];
+  return '<svg class="sp" width="'+w+'" height="'+hh+'" viewBox="0 0 '+w+' '+hh+'" aria-hidden="true"><polyline fill="none" stroke="'+(up?"#14a85a":"#e0483e")+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="'+pts+'"/></svg>';
+}
+function render(){
+  document.getElementById("wk").textContent="Semaine "+Math.min(S.week,W)+" / "+W;
+  document.getElementById("bar").style.width=((S.week-1)/W*100)+"%";
+  document.getElementById("cash").textContent=fmt(S.cash);
+  var tot=worth();var te=document.getElementById("tot");te.textContent=fmt(tot);
+  te.style.color=tot>=START?"#9af0c0":"#ffb3ad";
+  document.getElementById("news").innerHTML="<small>Nouvelle de la semaine</small>"+EV[S.ev].t;
+  var go=document.getElementById("go");go.textContent=S.week===W?"Dernière semaine : voir le résultat 🏁":"Semaine suivante ▶";
+  var html="";
+  CO.forEach(function(c){
+    var d=S.last[c.id],pct=S.hist[c.id].length>1?Math.round(d/(S.price[c.id]-d)*100):0;
+    var cls=d>0?"u":d<0?"d":"z",ar=d>0?"▲ +":d<0?"▼ ":"= ";
+    html+='<div class="co" data-id="'+c.id+'"><div class="em">'+c.em+'</div>'+
+      '<div><div class="nm">'+c.nm+'</div><div class="sub">'+c.tx+'</div>'+
+      '<div class="pr"><b>'+fmt(S.price[c.id])+'</b>'+(S.hist[c.id].length>1?'<span class="ch '+cls+'">'+ar+Math.abs(pct)+' %</span>':'')+spark(S.hist[c.id])+'</div></div>'+
+      '<div class="ctl"><button class="m" data-a="s" aria-label="Vendre '+c.nm+'"'+(S.own[c.id]?"":" disabled")+'>−</button><span>'+S.own[c.id]+'</span>'+
+      '<button data-a="b" aria-label="Acheter '+c.nm+'"'+(S.cash>=S.price[c.id]?"":" disabled")+'>+</button></div></div>';
+  });
+  document.getElementById("list").innerHTML=html;
+}
+function lesson(){
+  var vals=CO.map(function(c){return S.own[c.id]*S.price[c.id]}),inv=vals.reduce(function(a,b){return a+b},0),
+      kinds=vals.filter(function(v){return v>0}).length,top=Math.max.apply(0,vals),out=[];
+  if(S.trades===0)out.push("Tu n'as rien acheté : tes pièces sont en sécurité, mais elles ne peuvent pas grandir.");
+  else if(kinds>=3)out.push("Bravo : tu as réparti tes pièces dans plusieurs entreprises. Si l'une baisse, les autres peuvent te protéger.");
+  else if(inv>0&&kinds<=1)out.push("Tu avais tout dans une seule entreprise. Astuce : ne mets pas tous tes œufs dans le même panier !");
+  else out.push("Tu as choisi 2 entreprises. Essaie d'en prendre un peu plus pour mieux te protéger.");
+  if(S.cash>START*0.6&&S.trades>0)out.push("Une grande partie de tes pièces dormait : placée, elle peut grandir (ou baisser).");
+  out.push("Les nouvelles aident à deviner, mais pas toujours : les prix peuvent surprendre. C'est pour ça qu'on est patient.");
+  return out.map(function(t){return "• "+t}).join("<br>");
+}
+function finish(){
+  var t=worth(),g=t-START,stars=t>=START*1.7?3:t>=START*1.25?2:t>=START?1:0;
+  var titles=["Bonne expérience !","Bien joué !","Très bien joué !","Champion de la bourse !"];
+  document.getElementById("stars").textContent=stars?"⭐".repeat(stars):"🌱";
+  document.getElementById("etitle").textContent=titles[stars];
+  document.getElementById("eres").innerHTML="Tu avais <b>100</b> pièces, tu en as maintenant <b>"+fmt(t)+"</b> ("+(g>=0?"+":"")+fmt(g)+").";
+  document.getElementById("lesson").innerHTML=lesson();
+  var best=parseInt(store("mb_best")||"0",10),nb=t>best;if(nb)store("mb_best",String(t));
+  document.getElementById("ebest").textContent=!best?"Score enregistré : "+fmt(t)+" pièces":nb?"Nouveau record !":"Ton record : "+fmt(best)+" pièces";
+  document.getElementById("end").classList.add("show");
+}
+document.getElementById("list").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b||b.disabled)return;
+  var id=b.closest(".co").dataset.id;(b.dataset.a==="b"?buy:sell)(id);render();
+});
+document.getElementById("go").onclick=function(){
+  advance();
+  if(S.week>W){render();finish()}else render();
+  document.getElementById("list").scrollTop=0;
+};
+document.getElementById("start").onclick=function(){document.getElementById("intro").classList.remove("show");store("mb_seen","1")};
+document.getElementById("again").onclick=function(){document.getElementById("end").classList.remove("show");newGame();render()};
+newGame();render();
+if(!store("mb_seen"))document.getElementById("intro").classList.add("show");
+window.__mb={get S(){return S},newGame:newGame,advance:advance,buy:buy,sell:sell,worth:worth,render:render,CO:CO,EV:EV,W:W};
+})();
+</script>
+</body>
+</html>
