@@ -8,7 +8,7 @@ struct GameView: UIViewRepresentable {
         config.websiteDataStore = .default()          // garde les records (localStorage) entre les lancements
         let web = WKWebView(frame: .zero, configuration: config)
         web.isOpaque = false
-        web.backgroundColor = UIColor(red: 15/255, green: 61/255, blue: 58/255, alpha: 1)
+        web.backgroundColor = UIColor(red: 14/255, green: 36/255, blue: 104/255, alpha: 1)
         web.scrollView.backgroundColor = web.backgroundColor
         web.scrollView.bounces = false
         web.scrollView.isScrollEnabled = true

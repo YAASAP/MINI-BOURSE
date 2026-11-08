@@ -6,7 +6,7 @@ struct MiniBourseApp: App {
         WindowGroup {
             ContentView()
                 .ignoresSafeArea()
-                .background(Color(red: 15/255, green: 61/255, blue: 58/255))
+                .background(Color(red: 14/255, green: 36/255, blue: 104/255))
                 .preferredColorScheme(.dark)
         }
     }

@@ -1,5 +1,5 @@
 # Mini Bourse (jeu iPhone pour enfants, sans Mac)
-Jeu d'initiation à la bourse : 6 entreprises imaginaires, 100 pièces fictives, 12 semaines, une nouvelle à lire chaque semaine, une leçon à la fin (ne pas tout mettre dans le même panier, patience). Gratuit, hors ligne, sans publicité, sans achat, sans collecte de données, aucun vrai argent ni vraie société.
+Jeu d'initiation à la bourse pour enfants : accueil avec niveau, portefeuille, marchés (6 entreprises imaginaires, 100 pièces fictives, 12 semaines), quiz, défis et leçons. Gratuit, hors ligne, sans publicité, sans achat, sans collecte de données, aucun vrai argent ni vraie société.
 
 ## Mise en ligne
 1. Nouveau dépôt GitHub `mini-bourse`, y déposer ce dossier (`.github` compris).
